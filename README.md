@@ -1,8 +1,14 @@
 # dotty
+Manage dots on Kanban boards
 
-# environment setup
+# setup
 ```
 virtualenv -p python3 venv
 . venv/bin/activate
-pip install -r requirements.txt
+make init
+```
+
+# run tests
+```
+make test
 ```

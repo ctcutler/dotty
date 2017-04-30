@@ -1,4 +1,5 @@
-from dotty import board
+from dotty import asana
+import sys
 
-b = board.Board()
+b = asana.AsanaBoard(sys.argv[1])
 b.load()

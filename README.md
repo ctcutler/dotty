@@ -13,12 +13,9 @@ make init
 python -m dotty
 ```
 
-# install for development
-```
-pip install -e .
-```
-
-# run tests
-```
-make test
-```
+# make targets
+- `make init`: load requirements
+- `make tests`: run tests
+- `make install`: install dotty
+- `make develop`: install dotty for development
+- `make uninstall`: uninstall dotty

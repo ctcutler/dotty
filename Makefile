@@ -1,7 +1,16 @@
 init:
 	pip install -r requirements.txt
 
-test:
-	py.test test_dotty.py
+install:
+	pip install .
 
-.PHONY: init test
+develop:
+	pip install -e .
+
+uninstall:
+	pip uninstall dotty
+
+test:
+	py.test tests
+
+.PHONY: init test install develop uninstall

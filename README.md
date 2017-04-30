@@ -8,6 +8,16 @@ virtualenv -p python3 venv
 make init
 ```
 
+# run
+```
+python -m dotty
+```
+
+# install for development
+```
+pip install -e .
+```
+
 # run tests
 ```
 make test

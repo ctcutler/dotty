@@ -1,6 +1,6 @@
 venv
 __pycache__
-.swp
+*.swp
 *.egg-info
 .cache
 config/*.conf

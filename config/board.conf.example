@@ -1,0 +1,4 @@
+[some_board]
+type = asana
+token = <asana token>
+board_id = <asana board id>

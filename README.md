@@ -10,7 +10,7 @@ make init
 
 # run
 ```
-python -m dotty
+python -m dotty <config_file>
 ```
 
 # make targets

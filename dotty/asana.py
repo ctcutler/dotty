@@ -158,9 +158,10 @@ def task_dot_count(history, now, dot_factor=DAILY_DOTS):
 
 class AsanaBoard(board.Board):
     ''' Asana implementation of Board abstract base class. '''
-    def __init__(self, token, board_id):
+    def __init__(self, token, board_id, weekly_dots):
         self.token = token
         self.board_id = board_id
+        self.weekly_dots = weekly_dots
 
     def load(self):
         now = time.time()
@@ -175,5 +176,6 @@ class AsanaBoard(board.Board):
             stories = client.tasks.stories(task['id'])
             history = task_history(project['name'], stories)
             print(history)
-            dot_count = task_dot_count(history, now)
+            dot_factor = WEEKLY_DOTS if self.weekly_dots else DAILY_DOTS
+            dot_count = task_dot_count(history, now, dot_factor=dot_factor)
             print(dot_count)

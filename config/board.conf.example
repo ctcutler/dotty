@@ -2,3 +2,4 @@
 type = asana
 token = <asana token>
 board_id = <asana board id>
+weekly_dots = false

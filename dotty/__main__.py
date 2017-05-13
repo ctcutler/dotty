@@ -16,13 +16,14 @@ boards = []
 for section_name in config.sections():
     section = config[section_name]
     board_type = section['type']
+    weekly_dots = section['weekly_dots'].lower() == 'true'
 
     if board_type == 'asana':
         board_class = asana.AsanaBoard
     else:
         print('Ignoring unknown board type: {}'.format(board_type))
 
-    board = board_class(section['token'], section['id'])
+    board = board_class(section['token'], section['id'], weekly_dots)
     boards.append(board)
 
 for board in boards:

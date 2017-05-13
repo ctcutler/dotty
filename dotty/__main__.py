@@ -4,7 +4,7 @@ import sys
 from dotty import asana, github
 
 if len(sys.argv) != 2:
-  print("usage: python -m dotty config_file")
+  print('usage: python -m dotty config_file')
   sys.exit(-1)
 
 config_fn = sys.argv[1]

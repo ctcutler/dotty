@@ -23,7 +23,9 @@ for section_name in config.sections():
     else:
         print('Ignoring unknown board type: {}'.format(board_type))
 
-    board = board_class(section['token'], section['id'], weekly_dots)
+    board = board_class(
+        section['token'], section['id'], section['workspace'], weekly_dots
+    )
     boards.append(board)
 
 for board in boards:

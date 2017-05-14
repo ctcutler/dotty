@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 from datetime import datetime, timedelta
 import json
 import re
@@ -7,6 +8,8 @@ import asana
 
 from dotty import board
 
+DOT = '•'
+DOT_RE = re.compile('^'+DOT+'+$')
 ADD_RE = re.compile(r'^added to (?P<board>.+)$')
 MOVE_RE = re.compile(r'^moved from (?P<from_column>.+) to (?P<column>.+) \((?P<board>.+)\)$')
 DAY = 24 * 60 * 60
@@ -158,10 +161,11 @@ def task_dot_count(history, now, dot_factor=DAILY_DOTS):
 
 class AsanaBoard(board.Board):
     ''' Asana implementation of Board abstract base class. '''
-    def __init__(self, token, board_id, weekly_dots):
+    def __init__(self, token, board_id, workspace, weekly_dots):
         self.token = token
         self.board_id = board_id
         self.weekly_dots = weekly_dots
+        self.workspace = workspace
 
     def load(self):
         now = time.time()
@@ -171,11 +175,38 @@ class AsanaBoard(board.Board):
             # skip sections
             if task['name'].endswith(':'):
                 continue
+
+            task_id = task['id']
+
             print()
             print(task['name'])
-            stories = client.tasks.stories(task['id'])
+
+            stories = client.tasks.stories(task_id)
             history = task_history(project['name'], stories)
-            print(history)
             dot_factor = WEEKLY_DOTS if self.weekly_dots else DAILY_DOTS
             dot_count = task_dot_count(history, now, dot_factor=dot_factor)
-            print(dot_count)
+            new_dots = DOT * dot_count
+
+            # remove any inappropriate dot tags
+            for tag in client.tasks.tags(task_id):
+                tag_name = tag['name']
+                if DOT_RE.search(tag_name) and tag_name != new_dots:
+                    client.tasks.remove_tag(task_id, {'tag': tag['id']})
+
+            # FIXME:
+            # there's no good way to search for tags by name for reuse
+            # - GET /workspaces/15388478772830/typeahead is flaky
+            # - GET /tags?limit=10&workspace=15388478772830 returns
+            #   *all* the tags in the workspace
+            # - it is unclear whether Asana actually tolerates tags with
+            #   interesting characters like bullets
+
+            #if dot_count > 0:
+            #    params = {'workspace': self.workspace, 'name': new_dots}
+            #    new_tag = client.tags.create(params)
+            #    print(new_tag)
+            #    return
+
+            # if dot count is non zero and task doesn't have right dot tag
+            #   if tag doesn't exist, create it
+            #   add tag to task

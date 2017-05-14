@@ -1,5 +1,6 @@
 [some_board]
 type = asana
 token = <asana token>
-board_id = <asana board id>
+id = <asana board id>
+workspace = <asana workspace id>
 weekly_dots = false

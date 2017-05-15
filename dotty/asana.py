@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 from datetime import datetime, timedelta
 import json
 import re
@@ -7,6 +9,8 @@ import asana
 
 from dotty import board
 
+DOT = '•'
+DOTS_RE = re.compile(r'^.+(?P<dots> '+DOT+'+)$')
 ADD_RE = re.compile(r'^added to (?P<board>.+)$')
 MOVE_RE = re.compile(r'^moved from (?P<from_column>.+) to (?P<column>.+) \((?P<board>.+)\)$')
 DAY = 24 * 60 * 60
@@ -168,14 +172,26 @@ class AsanaBoard(board.Board):
         client = asana.Client.access_token(self.token)
         project = client.projects.find_by_id(self.board_id)
         for task in client.tasks.find_by_project(self.board_id):
+            task_name = task['name']
+            task_id = task['id']
+
             # skip sections
-            if task['name'].endswith(':'):
+            if task_name.endswith(':'):
                 continue
-            print()
-            print(task['name'])
-            stories = client.tasks.stories(task['id'])
+
+            stories = client.tasks.stories(task_id)
             history = task_history(project['name'], stories)
-            print(history)
             dot_factor = WEEKLY_DOTS if self.weekly_dots else DAILY_DOTS
             dot_count = task_dot_count(history, now, dot_factor=dot_factor)
-            print(dot_count)
+
+            if DOTS_RE.search(task_name):
+                new_task_name = task_name.rsplit(' ', 1)[0]
+            else:
+                new_task_name = task_name
+
+            if dot_count:
+                new_task_name += ' ' + DOT * dot_count
+
+            if new_task_name != task_name:
+                print('{} => {}'.format(task_name, new_task_name))
+                client.tasks.update(task_id, {'name': new_task_name})

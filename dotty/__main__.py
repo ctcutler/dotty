@@ -1,7 +1,7 @@
 import configparser
 import sys
 
-from dotty import asana, github
+from dotty import board
 
 if len(sys.argv) != 2:
   print('usage: python -m dotty config_file')
@@ -15,16 +15,9 @@ with open(config_fn) as config_file:
 boards = []
 for section_name in config.sections():
     section = config[section_name]
-    board_type = section['type']
     weekly_dots = section['weekly_dots'].lower() == 'true'
-
-    if board_type == 'asana':
-        board_class = asana.AsanaBoard
-    else:
-        print('Ignoring unknown board type: {}'.format(board_type))
-
-    board = board_class(section['token'], section['id'], weekly_dots)
-    boards.append(board)
+    b = board.Board(section['token'], section['id'], weekly_dots)
+    boards.append(b)
 
 for board in boards:
     board.load()

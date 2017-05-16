@@ -2,3 +2,4 @@
 token = <asana token>
 board_id = <asana board id>
 weekly_dots = false
+columns = <comma separated column names>

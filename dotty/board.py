@@ -160,25 +160,37 @@ def task_dot_count(history, now, dot_factor=DAILY_DOTS):
 
 class Board:
     ''' Asana implementation of Board abstract base class. '''
-    def __init__(self, token, board_id, weekly_dots):
+    def __init__(self, token, board_id, weekly_dots, columns):
         self.token = token
         self.board_id = board_id
         self.weekly_dots = weekly_dots
+        self.columns = columns
 
     def load(self):
         now = time.time()
         client = asana.Client.access_token(self.token)
         project = client.projects.find_by_id(self.board_id)
-        for task in client.tasks.find_by_project(self.board_id):
+        project_name = project['name']
+        params = { 'opt_expand': 'memberships' }
+        for task in client.tasks.find_by_project(self.board_id, params):
             task_name = task['name']
             task_id = task['id']
+            section_name = None
+            for membership in task['memberships']:
+                if membership['project']['name'] == project_name:
+                    section_name = membership['section']['name']
+                    break
 
             # skip sections
-            if task_name.endswith(':'):
+            if task_name == section_name:
+                continue
+
+            # skip columns that weren't requested
+            if section_name not in self.columns:
                 continue
 
             stories = client.tasks.stories(task_id)
-            history = task_history(project['name'], stories)
+            history = task_history(project_name, stories)
             dot_factor = WEEKLY_DOTS if self.weekly_dots else DAILY_DOTS
             dot_count = task_dot_count(history, now, dot_factor=dot_factor)
 

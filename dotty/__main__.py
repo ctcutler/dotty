@@ -16,7 +16,8 @@ boards = []
 for section_name in config.sections():
     section = config[section_name]
     weekly_dots = section['weekly_dots'].lower() == 'true'
-    b = board.Board(section['token'], section['id'], weekly_dots)
+    columns = [c.strip() for c in section['columns'].split(',')]
+    b = board.Board(section['token'], section['id'], weekly_dots, columns)
     boards.append(b)
 
 for board in boards:

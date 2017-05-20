@@ -8,13 +8,16 @@ import time
 import asana
 
 DOT = '•'
-DOTS_RE = re.compile(r'^.+(?P<dots> '+DOT+'+)$')
+# dots show up either as 'foo bar | •••' or as 'foo bar | • x 12'
+DOTS_RE = re.compile(r'^.+ \| ('+DOT+'+|'+DOT+' x \d+)$')
 ADD_RE = re.compile(r'^added to (?P<board>.+)$')
-MOVE_RE = re.compile(r'^moved from (?P<from_column>.+) to (?P<column>.+) \((?P<board>.+)\)$')
+MOVE_RE = re.compile(
+    r'^moved from (?P<from_column>.+) to (?P<column>.+) \((?P<board>.+)\)$')
 DAY = 24 * 60 * 60
 WEEK = 7 * DAY
 WEEKLY_DOTS = 5 * DAY
 DAILY_DOTS = DAY
+MAX_DOTS = 5
 
 def iso8601_to_epoch(iso_string):
     dt = datetime.strptime(iso_string, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -195,12 +198,14 @@ class Board:
             dot_count = task_dot_count(history, now, dot_factor=dot_factor)
 
             if DOTS_RE.search(task_name):
-                new_task_name = task_name.rsplit(' ', 1)[0]
+                new_task_name = task_name.rsplit(' | ', 1)[0]
             else:
                 new_task_name = task_name
 
-            if dot_count:
-                new_task_name += ' ' + DOT * dot_count
+            if dot_count > MAX_DOTS:
+                new_task_name += ' | {} x {}'.format(DOT, dot_count)
+            elif dot_count > 0:
+                new_task_name += ' | ' + DOT * dot_count
 
             if new_task_name != task_name:
                 print('{} => {}'.format(task_name, new_task_name))

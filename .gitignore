@@ -3,5 +3,5 @@ __pycache__
 *.swp
 *.egg-info
 .cache
-config/*.conf
+config/*.json
 *.pyc

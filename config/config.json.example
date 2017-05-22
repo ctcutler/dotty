@@ -1,0 +1,13 @@
+{
+    "boards": [
+        {
+            "token": "<token>",
+            "id": 1234567890,
+            "weekly_dots": false,
+            "columns": [
+                "Some Column:",
+                "Some Other Column::"
+            ]
+        }
+    ]
+}

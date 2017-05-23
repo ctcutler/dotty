@@ -37,7 +37,7 @@ class Board:
             custom_fields = [
                 (custom_field['name'], custom_field['enum_value']['name'])
                 for custom_field in task['custom_fields']
-                if custom_field['enum_value']]
+                if custom_field.get('enum_value')]
             section_name = None
             for membership in task['memberships']:
                 if membership['project']['name'] == project_name:

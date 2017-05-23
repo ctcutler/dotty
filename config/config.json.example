@@ -6,8 +6,11 @@
             "weekly_dots": false,
             "columns": [
                 "Some Column:",
-                "Some Other Column::"
-            ]
+                "Some Other Column:"
+            ],
+            "custom_fields": {
+                "Main team": "Full-stack"
+            }
         }
     ]
 }

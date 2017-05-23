@@ -18,21 +18,26 @@ MAX_DOTS = 5
 
 class Board:
     ''' Asana implementation of Board abstract base class. '''
-    def __init__(self, token, board_id, weekly_dots, columns):
+    def __init__(self, token, board_id, weekly_dots, columns, reqd_fields):
         self.token = token
         self.board_id = board_id
         self.weekly_dots = weekly_dots
         self.columns = columns
+        self.reqd_fields = reqd_fields.items()
 
     def load(self):
         now = time.time()
         client = asana.Client.access_token(self.token)
         project = client.projects.find_by_id(self.board_id)
         project_name = project['name']
-        params = { 'opt_expand': 'memberships' }
+        params = { 'opt_expand': 'memberships,custom_fields' }
         for task in client.tasks.find_by_project(self.board_id, params):
             task_name = task['name']
             task_id = task['id']
+            custom_fields = [
+                (custom_field['name'], custom_field['enum_value']['name'])
+                for custom_field in task['custom_fields']
+                if custom_field['enum_value']]
             section_name = None
             for membership in task['memberships']:
                 if membership['project']['name'] == project_name:
@@ -45,6 +50,10 @@ class Board:
 
             # skip columns that weren't requested
             if section_name not in self.columns:
+                continue
+
+            # skip tasks that don't have the correct custom fields
+            if not all(reqd in custom_fields for reqd in self.reqd_fields):
                 continue
 
             stories = client.tasks.stories(task_id)

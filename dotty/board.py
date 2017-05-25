@@ -40,7 +40,8 @@ class Board:
                 if custom_field.get('enum_value')]
             section_name = None
             for membership in task['memberships']:
-                if membership['project']['name'] == project_name:
+                if membership['project']['name'] == project_name\
+                    and membership['section']:
                     section_name = membership['section']['name']
                     break
 

@@ -13,11 +13,11 @@ with open(config_fn) as config_file:
 
 boards = []
 for board_config in config['boards']:
-    weekly_dots = board_config['weekly_dots']
+    weekly_dots = board_config.get('weekly_dots', False)
     columns = board_config['columns']
     token = board_config['token']
     board_id = board_config['id']
-    custom_fields = board_config['custom_fields']
+    custom_fields = board_config.get('custom_fields', {})
     b = board.Board(token, board_id, weekly_dots, columns, custom_fields)
     boards.append(b)
 

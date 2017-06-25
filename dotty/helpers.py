@@ -7,6 +7,8 @@ WEEK = 7 * DAY
 ADD_RE = re.compile(r'^added to (?P<board>.+)$')
 MOVE_RE = re.compile(
     r'^moved from (?P<from_column>.+) to (?P<column>.+) \((?P<board>.+)\)$')
+MOVE_RE2 = re.compile(r'^moved this Task from (?P<from_column>.+) to (?P<column>.+)$')
+MOVE_RE3 = re.compile(r'^moved this Task from (?P<from_column>.+) to (?P<column>.+) in (?P<board>.+)$')
 
 def iso8601_to_epoch(iso_string):
     dt = datetime.strptime(iso_string, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -16,20 +18,26 @@ def is_relevant(board_name, story):
     if story['type'] != 'system':
         return False
 
-    match = ADD_RE.search(story['text']) or MOVE_RE.search(story['text'])
+    match = ADD_RE.search(story['text'])\
+        or MOVE_RE.search(story['text'])\
+        or MOVE_RE2.search(story['text'])\
+        or MOVE_RE3.search(story['text'])
 
     if not match:
         return False
 
     board = match.groupdict().get('board')
 
-    if board != board_name:
+    if board and board != board_name:
         return False
 
     return True
 
 def history_item(story):
-    match = ADD_RE.search(story['text']) or MOVE_RE.search(story['text'])
+    match = ADD_RE.search(story['text'])\
+        or MOVE_RE.search(story['text'])\
+        or MOVE_RE2.search(story['text'])\
+        or MOVE_RE3.search(story['text'])
     column = match.groupdict().get('column')
     ts = iso8601_to_epoch(story['created_at'])
 
@@ -121,7 +129,7 @@ def elapsed(stint):
     if on_weekend(end):
         delta = end - max(start, weekend_start(end))
         total -= delta
-        end += delta
+        end -= delta
 
     # now that start and end have been adjusted, account for any weekends
     # in the middle of the range

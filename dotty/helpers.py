@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import json
 import re
+import time
 
 DAY = 24 * 60 * 60
 WEEK = 7 * DAY
@@ -10,9 +11,15 @@ MOVE_RE = re.compile(
 MOVE_RE2 = re.compile(r'^moved this Task from (?P<from_column>.+) to (?P<column>.+)$')
 MOVE_RE3 = re.compile(r'^moved this Task from (?P<from_column>.+) to (?P<column>.+) in (?P<board>.+)$')
 
+def ts(dt):
+    try:
+        return dt.timestamp()
+    except AttributeError:
+	return int((time.mktime(dt.timetuple())+dt.microsecond/1000000.0))
+
 def iso8601_to_epoch(iso_string):
     dt = datetime.strptime(iso_string, '%Y-%m-%dT%H:%M:%S.%fZ')
-    return dt.timestamp()
+    return ts(dt)
 
 def is_relevant(board_name, story):
     if story['type'] != 'system':
@@ -102,7 +109,7 @@ def weekend_end(epoch):
     dt = datetime.fromtimestamp(epoch)
     dt += timedelta(days=7-dt.weekday())
     dt = dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    return dt.timestamp()
+    return ts(dt)
 
 def weekend_start(epoch):
     'Return the weekend start before this timestamp'
@@ -110,7 +117,7 @@ def weekend_start(epoch):
     days = (dt.weekday() + 2) % 7
     dt -= timedelta(days=days)
     dt = dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    return dt.timestamp()
+    return ts(dt)
 
 def elapsed(stint):
     start = stint['start']

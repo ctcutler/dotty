@@ -7,7 +7,7 @@ import asana
 
 from dotty import helpers
 
-DOT = '•'
+DOT = u'•'
 # dots show up either as 'foo bar | •••' or as 'foo bar | • x 12'
 DOTS_RE = re.compile(r'^.+ \| ('+DOT+'+|'+DOT+' x \d+)$')
 DAY = 24 * 60 * 60
@@ -68,10 +68,10 @@ class Board:
                 new_task_name = task_name
 
             if dot_count > MAX_DOTS:
-                new_task_name += ' | {} x {}'.format(DOT, dot_count)
+                new_task_name += u' | {} x {}'.format(DOT, dot_count)
             elif dot_count > 0:
-                new_task_name += ' | ' + DOT * dot_count
+                new_task_name += u' | ' + DOT * dot_count
 
             if new_task_name != task_name:
-                print('{} => {}'.format(task_name, new_task_name))
+                print((u'{} => {}'.format(task_name, new_task_name)).encode('utf-8'))
                 client.tasks.update(task_id, {'name': new_task_name})
